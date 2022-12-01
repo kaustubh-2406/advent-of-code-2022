@@ -14,4 +14,13 @@ const cals = inp.split('\n').reduce((acc, val) => {
 	return acc;
 }, [] as number[]);
 
+console.log('Part 1');
 console.log(cals.sort((a, b) => b - a)[0]);
+
+console.log('Part 2');
+console.log(
+	cals
+		.sort((a, b) => b - a)
+		.slice(0, 3)
+		.reduce((acc, val) => acc + val, 0)
+);
