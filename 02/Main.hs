@@ -4,13 +4,14 @@ import Data.Maybe
 data Result a = Win a | Lose a | Tie a
 
 opponent = ["A","B","C"]
-mine     = ["X","Y","Z"]
+strategy   = ["X", "Y", "Z"]
 
 get_point :: Result Int -> Int 
 get_point (Win  x) = x + 6
 get_point (Tie  x) = x + 3
 get_point (Lose x) = x
 
+-- First part: The second column is considered to be my stategy to win..
 check_state :: [String] -> Result Int
 check_state [x, y]
   | i == 0 && j == 1 = Win  p
@@ -20,10 +21,23 @@ check_state [x, y]
   | otherwise        = Lose p
   where
     i = fromJust $ elemIndex x opponent
-    j = fromJust $ elemIndex y mine
+    j = fromJust $ elemIndex y strategy
     p = j + 1
 
-main = interact $ show . sum . map (get_point . check_state . words) . lines 
+-- Second part: suggests the stategy and we need to play as per strategy.
+-- X = Lose
+-- Y = Tie
+-- Z = Win
+part2 :: [String] -> Result Int
+part2 [x, y]
+  | y == "X" = Lose (l + 1)
+  | y == "Y" = Tie  (i + 1)
+  | y == "Z" = Win  (w + 1)
+  where 
+    i = fromJust $ elemIndex x opponent
+    w = (i + 1) `mod` 3
+    l = (i + 3 - 1) `mod` 3
+    t = i
 
--- main :: IO ()
--- main = interact $  $ words
+
+main = interact $ show . sum . map (get_point . part2 . words) . lines 
