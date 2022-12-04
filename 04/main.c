@@ -43,6 +43,7 @@ int main()
   assert(f != NULL);
 
   int overlapped_entries = 0;
+  int any_overlap = 0;
 
   while (true)
   {
@@ -62,8 +63,17 @@ int main()
     // part 1 logic...
     if ((a1 <= b1 && a2 >= b2) || (a1 >= b1 && a2 <= b2))
       overlapped_entries += 1;
+
+    // part 2 logic...
+    if (
+        (b1 >= a1 && b1 <= a2) ||
+        (b2 >= a1 && b2 <= a2) ||
+        (a1 >= b1 && a1 <= b2) ||
+        (a2 >= b1 && a2 <= b2))
+      any_overlap += 1;
   }
 
-  printf("overlaps: %d\n", overlapped_entries);
+  printf("Part 1 answer: %d\n", overlapped_entries);
+  printf("Part 2 answer: %d\n", any_overlap);
   return 0;
 }
