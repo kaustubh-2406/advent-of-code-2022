@@ -48,11 +48,16 @@ function parseInput(str: string): State {
 	return { stackState, procState };
 }
 
-function solve({ stackState, procState }: State) {
+function solve(
+	{ stackState, procState }: State,
+	{ isReversed = true }: { isReversed: boolean }
+) {
 	const val = procState.reduce((acc, [n, source, destn]) => {
 		const vals: string[] = acc[source].slice(-n);
+		const newvals = isReversed ? vals.reverse() : vals;
+
 		const newsource = acc[source].slice(0, -n);
-		const newdestn = [...acc[destn], ...vals.reverse()];
+		const newdestn = [...acc[destn], ...newvals];
 
 		return {
 			...acc,
@@ -65,8 +70,13 @@ function solve({ stackState, procState }: State) {
 		.map((v) => v.pop())
 		.join('');
 
-	console.log('==================== PART 1 ====================');
-	console.log('answer: ', ans);
+	return ans;
 }
 
-[sample, input].map(parseInput).map(solve);
+[sample, input].map(parseInput).forEach((val) => {
+	console.log('==================== PART 1 ====================');
+	console.log('answer: ', solve(val, { isReversed: true }));
+
+	console.log('==================== PART 2 ====================');
+	console.log('answer: ', solve(val, { isReversed: false }));
+});
