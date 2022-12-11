@@ -1,22 +1,18 @@
 import Prelude hiding (Left, Right)
 import Data.List
 
-type HeadPos = Position
-type TailPos = Position
 data Position = Position Int Int deriving(Show, Eq)
 data Move = Up | Down | Left | Right deriving(Show, Eq)
 
 data State = State { 
-    headPos  :: Position, 
-    tailPos  :: Position, 
-    trail :: [TailPos] 
+    rope  :: [Position],
+    trail :: [Position] 
   } deriving(Show)
 
 initialState :: State
 initialState = State {
-  headPos = Position 0 0,
-  tailPos = Position 0 0,
-  trail   = []
+  rope  = [Position 0 0, Position 0 0],
+  trail = []
 }
 
 moveHead :: Position -> Move -> Position
@@ -25,7 +21,8 @@ moveHead (Position x y) Down   = Position x (y + 1)
 moveHead (Position x y) Left   = Position (x - 1) y
 moveHead (Position x y) Right  = Position (x + 1) y
 
-moveTail :: TailPos -> HeadPos -> TailPos
+-- TailPos -> HeadPos -> TailPos
+moveTail :: Position -> Position -> Position
 moveTail (Position tx ty) (Position hx hy)
   -- if head is right next to tail.. no need to move it :)
   | abs (tx - hx) < 2 && abs (ty - hy) < 2 = Position tx ty
@@ -44,10 +41,11 @@ moveTail (Position tx ty) (Position hx hy)
 move :: State -> Move -> State
 move state m = newstate 
   where 
-    newhead = moveHead (headPos state) m
-    newtail = moveTail (tailPos state) newhead
+    (headpos:tailpos:[]) = rope state
+    newhead = moveHead headpos m
+    newtail = moveTail tailpos newhead
     newtrail = trail state ++ [newtail]
-    newstate = State { headPos = newhead, tailPos = newtail, trail = newtrail }
+    newstate = State { rope = [newhead, newtail], trail = newtrail }
 
 parseMoves :: [Move] -> String -> [Move]
 parseMoves moves xs 
