@@ -66,18 +66,56 @@ impl CRT {
     }
 }
 
-fn main() {
-    let input_file = "./data/input.txt";
-    let input = fs::read_to_string(input_file).expect("input.txt file not found");
+#[derive(Debug)]
+struct Screen {
+    width: usize,
+    curr_indx: usize,
+    state: [char; 240],
+    sprite_pos: [usize; 3],
+}
 
-    // let sample_file = "./data/sample.txt";
-    // let sample = fs::read_to_string(sample_file).expect("sample.txt file not found");
+impl Screen {
+    fn new(width: usize) -> Screen {
+        Screen {
+            width,
+            curr_indx: 0,
+            state: ['.'; 240],
+            sprite_pos: [0, 1, 2],
+        }
+    }
+
+    fn draw_pixel(&mut self, crt: &CRT) {
+        let w = self.width;
+        let value = ((self.curr_indx as usize) + w) % w;
+        self.sprite_pos = [crt.x, crt.x + 1, crt.x + 2].map(|x| ((x + 40) % 40) as usize);
+
+        if self.sprite_pos.contains(&(value + 1)) {
+            self.state[self.curr_indx] = '#';
+        }
+
+        self.curr_indx += 1;
+
+        println!(
+            "x {:?} && cycle {} && curr_indx {:?} && sprite_pos: {:?}",
+            crt.x, crt.cycle, self.curr_indx, self.sprite_pos
+        );
+    }
+}
+
+fn main() {
+    // let input_file = "./data/input.txt";
+    // let input = fs::read_to_string(input_file).expect("input.txt file not found");
+
+    let sample_file = "./data/sample.txt";
+    let input = fs::read_to_string(sample_file).expect("sample.txt file not found");
 
     let instructions = parse_instructions(input);
     let mut crt = CRT::new(instructions);
     let mut signals: Vec<isize> = vec![];
+    let mut screen = Screen::new(40);
 
-    for _ in 0..230 {
+    for _ in 0..240 {
+        screen.draw_pixel(&crt);
         crt.step();
 
         if vec![20, 60, 100, 140, 180, 220].contains(&crt.cycle) {
@@ -86,5 +124,12 @@ fn main() {
         }
     }
 
-    println!("{:?}", signals.iter().sum::<isize>())
+    println!("{:?}", signals.iter().sum::<isize>());
+
+    for i in 0..6 {
+        for j in 0..40 {
+            print!("{}", screen.state[(i * 40) + j]);
+        }
+        println!("")
+    }
 }
